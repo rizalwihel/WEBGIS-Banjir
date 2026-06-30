@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Monitoring | Siaga Banjir Kab. Bekasi</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+         :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --sidebar: #1e293b;
+            --card-bg: #0f172a;
+            --border-color: #334155;
+            --text-muted: #94a3b8;
+        }
+        /* Update CSS di sistem-utama.html */
+        
+        path.leaflet-interactive {
+            transition: fill-opacity 0.3s ease, stroke-width 0.3s ease, stroke 0.3s ease;
+            outline: none !important;
+            /* Menghilangkan kotak outline default browser */
+        }
+        /* Memastikan fokus klik tidak memunculkan kotak */
+        
+        path.leaflet-interactive:focus {
+            outline: none !important;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--primary);
+            color: white;
+            overflow: hidden;
+        }
+        /* KEYFRAMES UNTUK ANIMASI UI/UX */
+        
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        @keyframes pulse-dot {
+            0% {
+                box-shadow: 0 0 0 0 rgba(var(--rgb-color), 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(var(--rgb-color), 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(var(--rgb-color), 0);
+            }
+        }
+        
+        header {
+            background: var(--sidebar);
+            padding: 14px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+        
+        .brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        
+        .stat-item:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            width: 100vw;
+            height: calc(100vh - 63px);
+            position: relative;
+        }
+        /* SIDEBAR ANIMATION */
+        
+        .sidebar {
+            width: 440px;
+            min-width: 320px;
+            max-width: 600px;
+            height: 100%;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 22px;
+            gap: 18px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            resize: horizontal;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+            animation: slideInLeft 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        
+        .content-right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        
+        #map {
+            flex: 1;
+            width: 100%;
+            z-index: 1;
+            animation: fadeIn 1.2s ease-in-out forwards;
+        }
+        /* BOTTOM CHART ANIMATION */
+        
+        .bottom-chart-panel {
+            height: 280px;
+            min-height: 40px;
+            max-height: 500px;
+            width: 100%;
+            background: #111827;
+            border-top: 4px solid var(--border-color);
+            padding: 15px 30px 20px 30px;
+            z-index: 1002;
+            display: flex;
+            flex-direction: column;
+            resize: vertical;
+            overflow: hidden;
+            opacity: 0;
+            animation: slideInUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) 0.3s forwards;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .card-header h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 14px 45px 14px 16px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        .search-container input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        .search-container i {
+            position: absolute;
+            right: 18px;
+            top: 16px;
+            color: var(--accent);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+        /* DATA GRID HOVER EFFECTS */
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .data-box {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 15px 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: default;
+        }
+        
+        .data-box:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15);
+        }
+        
+        .data-val {
+            display: block;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+        
+        .data-lbl {
+            display: block;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* AI CARD GLOWING BACKGROUND */
+        
+        .ai-card {
+            background: linear-gradient(270deg, #0f172a, #1e3a8a, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientMove 8s ease infinite;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+        }
+        
+        .ai-text {
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .ai-text h1,
+        .ai-text h2,
+        .ai-text h3 {
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--accent);
+            padding-left: 10px;
+        }
+        
+        .ai-text strong {
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .ai-text ul {
+            padding-left: 18px;
+            margin-bottom: 15px;
+            margin-top: 8px;
+        }
+        
+        .ai-text li {
+            margin-bottom: 6px;
+        }
+        
+        .ai-text li::marker {
+            color: var(--accent);
+        }
+        
+        .ai-text p {
+            margin-bottom: 12px;
+        }
+        
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 0;
+            animation: pulse-text 1.5s infinite;
+        }
+        
+        .ai-loading i {
+            animation: spin 1s linear infinite;
+            font-size: 18px;
+        }
+        
+        @keyframes pulse-text {
+            0% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.6;
+            }
+        }
+        
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .chart-header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .chart-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            color: var(--success);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chart-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+        
+        .chart-container-box {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .leaflet-right .leaflet-control-layers {
+            margin-right: 20px !important;
+            margin-top: 20px !important;
+            background: var(--sidebar) !important;
+            color: white !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        }
+        /* PULSING LEGEND */
+        
+        .legend {
+            position: absolute;
+            top: 90px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 1s ease-in-out 0.5s forwards;
+            opacity: 0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .dot.red {
+            background: var(--danger);
+            --rgb-color: 239, 68, 68;
+            animation: pulse-dot 2s infinite;
+        }
+        
+        .dot.yellow {
+            background: var(--warning);
+            --rgb-color: 245, 158, 11;
+            animation: pulse-dot 2s infinite 0.3s;
+        }
+        
+        .dot.green {
+            background: var(--success);
+            --rgb-color: 16, 185, 129;
+            animation: pulse-dot 2s infinite 0.6s;
+        }
+        
+         ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        /* CSS untuk Drag Handle (Pembatas Peta & Grafik) */
+        
+        .resizer-y {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            cursor: ns-resize;
+            /* Kursor panah atas-bawah */
+            z-index: 1003;
+            /* Harus lebih tinggi dari map */
+            transition: background-color 0.3s ease;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .resizer-y:hover,
+        .resizer-y.active {
+            background: var(--accent);
+        }
+        /* Garis kecil di tengah resizer sebagai indikator bisa ditarik */
+        
+        .resizer-y::after {
+            content: '';
+            width: 40px;
+            height: 2px;
+            background: white;
+            opacity: 0.5;
+            border-radius: 2px;
+        }
+        /* Hapus animasi bawaan panel grafik agar tidak bentrok saat ditarik */
+        
+        .bottom-chart-panel {}
+        /* CSS Untuk Tombol Voice AI */
+        
+        .btn-voice {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-voice:hover {
+            background: var(--accent);
+            color: white;
+        }
+        /* State saat suara sedang berbicara (Warna Merah) */
+        
+        .btn-voice.playing {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        /* --- CSS UNTUK DROPDOWN AUTOCOMPLETE --- */
+        
+        .autocomplete-items {
+            position: absolute;
+            top: 100%;
+            /* Menempel tepat di bawah kolom input */
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            /* Melengkung di bawah */
+            z-index: 1005;
+            /* Harus tinggi agar tidak tertutup peta */
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: none;
+            /* Disembunyikan saat tidak mengetik */
+        }
+        
+        .autocomplete-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        
+        .autocomplete-item:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: white;
+            padding-left: 20px;
+            /* Efek bergeser sedikit saat disentuh */
+        }
+        /* Membuat huruf yang cocok menjadi tebal dan berwarna biru */
+        
+        .autocomplete-item strong {
+            color: var(--accent);
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">
+            SIAGA BANJIR <span style="color:var(--accent)">KAB. BEKASI</span>
+        </div>
+        <div class="stats-bar" id="header-stats">
+            <div class="stat-item"><i class="fas fa-circle" style="color:var(--danger)"></i> Rawan: --</div>
+            <div class="stat-item"><i class="fas fa-circle" style="color:var(--warning)"></i> Waspada: --</div>
+            <div class="stat-item"><i class="fas fa-cloud-rain" style="color:var(--accent)"></i> Avg: -- mm</div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="search-container">
+                <input type="text" id="kecamatan-input" placeholder="Cari Lokasi Kecamatan..." autocomplete="off">
+                <div id="autocomplete-list" class="autocomplete-items"></div>
+                <i class="fas fa-search" id="search-icon"></i>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="getCurrentLocation()"><i class="fas fa-location-crosshairs"></i> GPS Saya</button>
+                <button class="btn btn-outline" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Beranda</button>
+            </div>
+
+            <div class="card" id="detail-card" style="display:none; animation: fadeIn 0.5s ease-in-out;">
+                <div class="card-header">
+                    <i class="fas fa-info-circle" style="color: var(--accent);"></i>
+                    <h3 id="kec-name">Detail Wilayah</h3>
+                </div>
+                <div class="data-grid">
+                    <div class="data-box">
+                        <span class="data-val" id="val-rain">--</span>
+                        <span class="data-lbl">Curah Hujan (mm)</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-val" id="val-status">--</span>
+                        <span class="data-lbl">Status Wilayah</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card ai-card">
+                <div class="card-header" style="border-bottom-color: rgba(59,130,246,0.3); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-robot" style="color: #60a5fa;"></i>
+                        <h3 style="color: white; font-weight: 800; margin: 0;">Analisis AI Agent (Groq)</h3>
+                    </div>
+                    <button id="btn-voice" class="btn-voice" onclick="toggleVoiceAI()" style="display: none;" title="Putar/Hentikan Suara">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <div id="ai-output" class="ai-text">
+                    <div style="opacity: 0.7; text-align: center; padding: 20px 0; transition: 0.3s;">
+                        <i class="fas fa-map-marked-alt" style="font-size: 28px; margin-bottom: 12px; display: block; color: var(--accent);"></i> Silakan pilih kecamatan pada peta untuk memicu pemrosesan data spasial oleh Agen AI.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-right-panel">
+            <div id="map"></div>
+
+            <div class="resizer-y" id="resizer"></div>
+            <div class="legend">...</div>
+
+            <div class="legend">
+                <div class="legend-item"><span class="dot red"></span> Sangat Rawan (Evakuasi)</div>
+                <div class="legend-item"><span class="dot yellow"></span> Waspada (Siaga)</div>
+                <div class="legend-item"><span class="dot green"></span> Aman (Kondisi Stabil)</div>
+            </div>
+
+            <div class="bottom-chart-panel">
+                <div class="chart-header-wrapper">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i> Analisis Titik Tren Riwayat & Prediksi Curah Hujan (WIB)
+                    </div>
+                    <div class="chart-date" id="current-date-label">--</div>
+                </div>
+                <div class="chart-container-box">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://103.87.66.175:5674/webhook";
+        let activeKecamatan = null;
+        let trendChartInstance = null;
+
+        function renderCurrentDate() {
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('current-date-label').innerText = new Date().toLocaleDateString('id-ID', options);
+        }
+        renderCurrentDate();
+
+        const map = L.map('map', {
+            zoomControl: true
+        }).setView([-6.23, 107.13], 11);
+        const basemaps = {
+            "Satelit (Esri)": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Esri Satellite'
+            }),
+            "Peta Jalan (OSM)": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'OpenStreetMap'
+            }),
+            "Peta Gelap (Dark)": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{y}/{x}{r}.png', {
+                attribution: 'CartoDB'
+            }),
+            "Ketinggian Kontur": L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: 'OpenTopoMap'
+            })
+        };
+        basemaps["Peta Jalan (OSM)"].addTo(map);
+        L.control.layers(basemaps, null, {
+            position: 'topright'
+        }).addTo(map);
+
+        let geojsonLayer;
+
+        function updateHeader() {
+            fetch(`${API_URL}/stats-ringkasan`)
+                .then(res => res.json())
+                .then(data => {
+                    const s = Array.isArray(data) ? data[0] : data;
+                    const rawAvg = s.rata_rata_hujan || s.avg_precipitation || 0;
+                    document.getElementById('header-stats').innerHTML = `
+                        <div class="stat-item"><i class="fas fa-circle" style="color:var(--danger)"></i> Rawan: ${s.jumlah_rawan || 0}</div>
+                        <div class="stat-item"><i class="fas fa-circle" style="color:var(--warning)"></i> Waspada: ${s.jumlah_waspada || 0}</div>
+                        <div class="stat-item"><i class="fas fa-cloud-rain" style="color:var(--accent)"></i> Avg: ${parseFloat(rawAvg).toFixed(2)} mm</div>
+                    `;
+                }).catch(err => console.error(err));
+        }
+
+        function loadMap() {
+            fetch(`${API_URL}/peta-banjir`)
+                .then(res => res.json())
+                .then(data => {
+                    if (geojsonLayer) {
+                        map.removeLayer(geojsonLayer);
+                    }
+                    geojsonLayer = L.geoJSON(data, {
+                        // 1. Atur gaya bawaan dan gaya saat wilayah sedang aktif/dipilih
+                        style: (f) => {
+                            const isSelected = (f.properties.kecamatan === activeKecamatan);
+                            return {
+                                fillColor: f.properties.status === 'Sangat Rawan' ? '#ef4444' : (f.properties.status === 'Waspada' ? '#f59e0b' : '#10b981'),
+                                weight: isSelected ? 4 : 1.5, // Garis tebal jika terpilih
+                                color: isSelected ? '#ffffff' : 'white', // Warna outline
+                                fillOpacity: isSelected ? 0.85 : 0.6, // Lebih pekat jika terpilih
+                                dashArray: isSelected ? '5, 5' : '' // Garis putus-putus biar estetik
+                            };
+                        },
+                        onEachFeature: (f, l) => {
+                            // 2. Efek Hover (Melayang saat kursor masuk)
+                            l.on('mouseover', (e) => {
+                                if (f.properties.kecamatan !== activeKecamatan) {
+                                    e.target.setStyle({
+                                        weight: 3,
+                                        color: '#60a5fa', // Outline biru neon
+                                        fillOpacity: 0.75
+                                    });
+                                    e.target.bringToFront(); // Bawa polygon ke paling depan
+                                }
+                            });
+
+                            // 3. Reset Hover (Saat kursor keluar)
+                            l.on('mouseout', (e) => {
+                                if (f.properties.kecamatan !== activeKecamatan) {
+                                    geojsonLayer.resetStyle(e.target);
+                                }
+                            });
+
+                            // 4. Efek Klik (Melayang Spesifik & Auto-Zoom Polygon)
+                            l.on('click', (e) => {
+                                activeKecamatan = f.properties.kecamatan;
+
+                                // Reset semua gaya peta agar yang lama kembali normal
+                                geojsonLayer.resetStyle();
+                                e.target.bringToFront();
+
+                                // Terbang (flyToBounds) tepat menutupi seluruh polygon kecamatan
+                                map.flyToBounds(e.target.getBounds(), {
+                                    padding: [40, 40], // Jarak aman dari pinggir layar
+                                    duration: 1.2 // Durasi animasi zoom
+                                });
+
+                                processDistrict(f.properties);
+                            });
+
+                            l.bindTooltip(`<b>${f.properties.kecamatan}</b>`, {
+                                sticky: true
+                            });
+                        }
+                    }).addTo(map);
+                });
+        }
+
+
+        function processDistrict(props) {
+            document.getElementById('detail-card').style.display = 'block';
+            document.getElementById('kec-name').innerText = props.kecamatan;
+
+            document.getElementById('val-rain').innerText = props.curah_hujan || 0;
+            document.getElementById('val-status').innerText = props.status || 'Aman';
+            document.getElementById('val-status').style.color = props.status === 'Sangat Rawan' ? 'var(--danger)' : (props.status === 'Waspada' ? 'var(--warning)' : 'var(--success)');
+
+            document.getElementById('ai-output').innerHTML = `
+                <div class="ai-loading">
+                    <i class="fas fa-circle-notch"></i>
+                    <span>Menganalisis skenario mitigasi dengan Groq AI...</span>
+                </div>
+            `;
+
+            // Mengambil Data dari Groq AI
+            fetch(`${API_URL}/api-mitigasi?nama=${encodeURIComponent(props.kecamatan)}`)
+                .then(res => res.json())
+                .then(data => {
+                    let rawContent = data["Rekomendasi System"] || "Rekomendasi tidak tersedia.";
+                    if (rawContent.startsWith('"') && rawContent.endsWith('"')) {
+                        rawContent = JSON.parse(rawContent);
+                    }
+                    document.getElementById('ai-output').innerHTML = marked.parse(rawContent);
+
+                    // 👇 UBAH BAGIAN INI: Simpan teks ke memori global dan munculkan tombol
+                    window.teksAISiapBaca = `Sistem mendeteksi wilayah Kecamatan ${props.kecamatan}. Berikut adalah analisis mitigasinya: ${rawContent}`;
+
+                    // Munculkan tombol dan reset kembali ke ikon volume
+                    document.getElementById('btn-voice').style.display = 'flex';
+                    resetVoiceUI();
+                })
+                .catch(err => {
+                    document.getElementById('ai-output').innerHTML = `<div style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Gagal menghubungi AI Agent. Pastikan Zrok aktif.</div>`;
+                    document.getElementById('btn-voice').style.display = 'none'; // Sembunyikan tombol jika error
+                });
+
+            fetch(`${API_URL}/riwayat-kecamatan?kecamatan=${encodeURIComponent(props.kecamatan)}`)
+                .then(res => res.json())
+                .then(res => {
+                    let list = res.data || [];
+                    const now = new Date();
+                    let labels = [],
+                        pastData = [],
+                        futureData = [];
+                    let sortedList = list.sort((a, b) => new Date(a.waktu) - new Date(b.waktu));
+
+                    // MEMAKSA PEMBUATAN 6 JAM KE BELAKANG, 1 SAAT INI, DAN 6 JAM KE DEPAN SECARA EKSPLISIT
+
+                    // 1. Enam Jam Ke Belakang (Sisi Kiri)
+                    for (let i = 6; i >= 1; i--) {
+                        let d = new Date(now.getTime() - (i * 60 * 60 * 1000));
+                        labels.push(d.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + " WIB");
+
+                        // Cek apakah ada data aktual di API pada jam tersebut
+                        let found = sortedList.find(item => {
+                            let itemD = new Date(item.waktu);
+                            return itemD.getHours() === d.getHours() && itemD.getDate() === d.getDate();
+                        });
+
+                        pastData.push(found ? (found.curah_hujan || 0) : 0);
+                        futureData.push(null);
+                    }
+
+                    // 2. Jam Saat Ini (Sisi Tengah)
+                    labels.push(now.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + " WIB (Sekarang)");
+                    let currentVal = props.curah_hujan || 0;
+                    pastData.push(currentVal);
+                    futureData.push(currentVal); // Menyambung garis riwayat ke prediksi
+
+                    // 3. Enam Jam Ke Depan (Sisi Kanan)
+                    let lastValForSim = currentVal;
+                    for (let i = 1; i <= 6; i++) {
+                        let d = new Date(now.getTime() + (i * 60 * 60 * 1000));
+                        labels.push(d.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + " WIB");
+                        pastData.push(null);
+
+                        // Cek apakah ada prediksi dari API pada jam tersebut
+                        let found = sortedList.find(item => {
+                            let itemD = new Date(item.waktu);
+                            return itemD.getHours() === d.getHours() && itemD.getDate() === d.getDate();
+                        });
+
+                        if (found) {
+                            futureData.push(found.curah_hujan || 0);
+                            lastValForSim = found.curah_hujan || 0;
+                        } else {
+                            // Jika data masa depan dari API kosong, buat simulasi tren cuaca menurun yang mulus
+                            lastValForSim = Math.max(0, lastValForSim - (Math.random() * (lastValForSim > 0 ? 0.3 : 0)));
+                            futureData.push(parseFloat(lastValForSim.toFixed(2)));
+                        }
+                    }
+
+                    renderTwoSidedChart(labels, pastData, futureData);
+                })
+                .catch(err => {
+                    console.error("Gagal load chart:", err);
+                });
+        }
+
+        function renderTwoSidedChart(labels, pastData, futureData) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+            }
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Riwayat Hujan Terlewat (Kiri)',
+                        data: pastData,
+                        borderColor: '#10b981',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 5,
+                        segment: {
+                            borderColor: '#10b981'
+                        },
+                        spanGaps: true,
+                        fill: false
+                    }, {
+                        label: 'Estimasi Prediksi Cuaca (Kanan)',
+                        data: futureData,
+                        borderColor: '#ef4444',
+                        borderWidth: 3,
+                        borderDash: [6, 6],
+                        pointBackgroundColor: '#ef4444',
+                        pointRadius: 5,
+                        spanGaps: true,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(255,255,255,0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Intensitas (mm)',
+                                color: '#94a3b8'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        fetch(`${API_URL}/api/kecamatan`)
+            .then(res => res.json())
+            .then(data => {
+                const datalist = document.getElementById('kecamatan-list');
+                data.forEach(k => {
+                    let opt = document.createElement('option');
+                    opt.value = k.nama || k.kecamatan;
+                    datalist.appendChild(opt);
+                });
+            });
+
+        document.getElementById('kecamatan-input').addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (!val) return;
+            geojsonLayer.eachLayer(l => {
+                if (l.feature.properties.kecamatan.toLowerCase() === val.toLowerCase()) {
+                    map.flyTo(l.getBounds().getCenter(), 12);
+                    activeKecamatan = l.feature.properties.kecamatan;
+                    processDistrict(l.feature.properties);
+                }
+            });
+        });
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const {
+                        latitude,
+                        longitude
+                    } = pos.coords;
+                    L.marker([latitude, longitude]).addTo(map).bindPopup("Lokasi Anda").openPopup();
+                    map.flyTo([latitude, longitude], 13);
+                });
+            }
+        }
+
+        updateHeader();
+        loadMap();
+        setInterval(() => {
+            updateHeader();
+            loadMap();
+        }, 30000);
+
+        // --- SCRIPT UNTUK INTERAKSI RESIZE PANEL BAWAH ---
+        const resizer = document.getElementById('resizer');
+        const bottomPanel = document.querySelector('.bottom-chart-panel');
+        const rightContainer = document.querySelector('.content-right-panel');
+        let isResizing = false;
+
+        // Saat mouse ditekan pada pembatas
+        resizer.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            resizer.classList.add('active');
+            document.body.style.cursor = 'ns-resize'; // Kunci kursor
+            map.dragging.disable(); // Cegah peta ikut tergeser secara tidak sengaja
+        });
+
+        // Saat mouse digerakkan (menarik)
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+
+            // Hitung sisa tinggi layar dari posisi kursor ke bawah
+            const containerRect = rightContainer.getBoundingClientRect();
+            const newHeight = containerRect.bottom - e.clientY;
+
+            // Batasi ukuran minimum dan maksimum grafik (100px s/d tinggi container minus 200px)
+            if (newHeight >= 40 && newHeight <= containerRect.height - 200) {
+                bottomPanel.style.height = newHeight + 'px';
+                map.invalidateSize(); // Wajib dipanggil agar peta Leaflet menyesuaikan ukuran baru
+            }
+        });
+
+        // Saat mouse dilepas (selesai ditarik)
+        document.addEventListener('mouseup', function(e) {
+            if (isResizing) {
+                isResizing = false;
+                resizer.classList.remove('active');
+                document.body.style.cursor = 'default'; // Kembalikan kursor
+                map.dragging.enable(); // Aktifkan drag peta kembali
+                map.invalidateSize();
+            }
+        });
+
+        // --- SCRIPT AUTOCOMPLETE PENCARIAN KECAMATAN (ANTI-GAGAL) ---
+
+        // 1. Data statis 23 Kecamatan di Kab. Bekasi (Super Cepat tanpa API)
+        const kecamatanDataList = [
+            "Babelan", "Bojongmangu", "Cabangbungin", "Cibarusah", "Cibitung",
+            "Cikarang Barat", "Cikarang Pusat", "Cikarang Selatan", "Cikarang Timur", "Cikarang Utara",
+            "Karangbahagia", "Kedungwaringin", "Muaragembong", "Pebayuran", "Serang Baru",
+            "Setu", "Sukakarya", "Sukawangi", "Tambelang", "Tambun Selatan", "Tambun Utara", "Tarumajaya"
+        ];
+
+        const searchInput = document.getElementById('kecamatan-input');
+        const autocompleteList = document.getElementById('autocomplete-list');
+        const searchIcon = document.getElementById('search-icon');
+
+        // 2. Deteksi otomatis SETIAP KALI pengguna mengetik huruf
+        searchInput.addEventListener('input', function() {
+            let val = this.value;
+            autocompleteList.innerHTML = '';
+
+            if (!val) {
+                autocompleteList.style.display = 'none';
+                return;
+            }
+
+            let hasResult = false;
+
+            // 3. Cek kecamatan yang mengandung ketikan
+            kecamatanDataList.forEach(kec => {
+                if (kec.toLowerCase().includes(val.toLowerCase())) {
+                    hasResult = true;
+
+                    let itemDiv = document.createElement('div');
+                    itemDiv.className = 'autocomplete-item';
+
+                    let regex = new RegExp("(" + val + ")", "gi");
+                    itemDiv.innerHTML = kec.replace(regex, "<strong>$1</strong>");
+
+                    itemDiv.addEventListener('click', function() {
+                        searchInput.value = kec;
+                        autocompleteList.style.display = 'none';
+                        triggerPencarian(kec);
+                    });
+
+                    autocompleteList.appendChild(itemDiv);
+                }
+            });
+
+            autocompleteList.style.display = hasResult ? 'block' : 'none';
+        });
+
+        // 4. Sembunyikan dropdown jika klik di luar
+        document.addEventListener('click', function(e) {
+            if (e.target !== searchInput && autocompleteList) {
+                autocompleteList.style.display = 'none';
+            }
+        });
+
+        // 5. Fungsi Pemicu Peta dan AI
+        function triggerPencarian(val) {
+            if (!val) return;
+            val = val.toLowerCase().trim();
+
+            geojsonLayer.eachLayer(l => {
+                if (l.feature.properties.kecamatan.toLowerCase() === val) {
+                    activeKecamatan = l.feature.properties.kecamatan;
+
+                    geojsonLayer.resetStyle();
+                    l.bringToFront();
+                    map.flyToBounds(l.getBounds(), {
+                        padding: [40, 40],
+                        duration: 1.2
+                    });
+
+                    processDistrict(l.feature.properties);
+                }
+            });
+        }
+
+        // 6. Tombol Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                autocompleteList.style.display = 'none';
+                let firstMatch = kecamatanDataList.find(k => k.toLowerCase().includes(this.value.toLowerCase()));
+                if (firstMatch) {
+                    this.value = firstMatch;
+                    triggerPencarian(firstMatch);
+                }
+            }
+        });
+
+        // 7. Ikon Kaca Pembesar
+        if (searchIcon) {
+            searchIcon.style.cursor = 'pointer';
+            searchIcon.addEventListener('click', function() {
+                autocompleteList.style.display = 'none';
+                let firstMatch = kecamatanDataList.find(k => k.toLowerCase().includes(searchInput.value.toLowerCase()));
+                if (firstMatch) {
+                    searchInput.value = firstMatch;
+                    triggerPencarian(firstMatch);
+                }
+            });
+        }
+
+        // --- SCRIPT UNTUK VOICE ASSISTANT AI (ON-DEMAND) ---
+        window.teksAISiapBaca = ""; // Variabel global untuk menyimpan teks
+
+        function toggleVoiceAI() {
+            const btnVoice = document.getElementById('btn-voice');
+            const icon = btnVoice.querySelector('i');
+
+            // Jika suara sedang berjalan, maka HENTIKAN
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                resetVoiceUI();
+            }
+            // Jika suara sedang diam, maka MULAI BACA
+            else {
+                if (window.teksAISiapBaca !== "") {
+                    // Bersihkan karakter markdown
+                    let teksBersih = window.teksAISiapBaca.replace(/[*#`_\-]/g, ' ').replace(/\s+/g, ' ').trim();
+                    let suaraAI = new SpeechSynthesisUtterance(teksBersih);
+
+                    suaraAI.lang = 'id-ID';
+                    suaraAI.rate = 1.1;
+
+                    // Event ketika suara selesai bicara otomatis
+                    suaraAI.onend = function() {
+                        resetVoiceUI();
+                    };
+
+                    // Mulai bicara
+                    window.speechSynthesis.speak(suaraAI);
+
+                    // Ubah tombol jadi mode "Stop" (Merah)
+                    btnVoice.classList.add('playing');
+                    icon.className = 'fas fa-stop';
+                }
+            }
+        }
+
+        // Fungsi bantuan untuk mengembalikan tombol ke bentuk semula
+        function resetVoiceUI() {
+            const btnVoice = document.getElementById('btn-voice');
+            if (btnVoice) {
+                const icon = btnVoice.querySelector('i');
+                btnVoice.classList.remove('playing');
+                icon.className = 'fas fa-volume-up';
+            }
+        }
+
+        // Tambahan: Hentikan suara jika pengguna mengklik kecamatan lain di tengah-tengah
+        map.on('click', function() {
+            window.speechSynthesis.cancel();
+            resetVoiceUI();
+        });
+    </script>
+</body>
+
+</html>

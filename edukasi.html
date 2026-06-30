@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Edukasi Mitigasi | Siaga Banjir Kab. Bekasi</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+         :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --light: #f8fafc;
+            --text-muted: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        /* Navigation */
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 8%;
+            background: rgba(255, 255, 255, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 15px;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .btn-monitor {
+            background: var(--accent);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-monitor::after {
+            display: none;
+        }
+        
+        .btn-monitor:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        /* Ripple Effect */
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        /* Hero Page Section */
+        
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 120px 8%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .page-hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .page-hero p {
+            font-size: 18px;
+            opacity: 0.85;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        section {
+            padding: 100px 8%;
+        }
+        
+        .section-tag {
+            color: var(--accent);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 800;
+        }
+        /* INTERACTIVE TABS MITIGASI */
+        
+        .tabs-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            background: var(--light);
+            padding: 10px;
+            border-radius: 20px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+        }
+        
+        .tab-btn:not(.active):hover {
+            color: var(--primary);
+            background: rgba(15, 23, 42, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .phase-card {
+            border-radius: 24px;
+            padding: 50px;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .phase-card h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .phase-card ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+        
+        .phase-card li {
+            margin-bottom: 20px;
+            font-size: 16px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease;
+        }
+        
+        .phase-card li:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .phase-card i {
+            font-size: 22px;
+            margin-top: 2px;
+        }
+        
+        .bg-pre {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .bg-during {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .bg-post {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        /* INTERACTIVE CHECKLIST EMERGENCY BAG */
+        
+        .emergency-bag {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 70px;
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+        }
+        
+        .bag-content {
+            flex: 1.2;
+        }
+        
+        .bag-img-container {
+            flex: 0.8;
+            text-align: center;
+            position: relative;
+        }
+        
+        .bag-img-container img {
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            transition: transform 0.5s ease;
+        }
+        
+        .emergency-bag:hover .bag-img-container img {
+            transform: scale(1.03) rotate(-2deg);
+        }
+        
+        .bag-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 35px;
+        }
+        
+        .bag-item {
+            background: var(--light);
+            padding: 16px 20px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .bag-item i.status-icon {
+            color: #cbd5e1;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+        
+        .bag-item .item-icon {
+            color: var(--accent);
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+        
+        .bag-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+        }
+        
+        .bag-item.checked {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+            transform: scale(0.98);
+        }
+        
+        .bag-item.checked i.status-icon {
+            color: white;
+            content: "\f058";
+            font-weight: 900;
+        }
+        
+        .bag-item.checked .item-icon {
+            color: white;
+        }
+        
+        .bag-item.checked span {
+            text-decoration: line-through;
+            opacity: 0.9;
+        }
+        /* Status Understanding */
+        
+        .status-guide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .status-card {
+            padding: 40px 30px;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: #ffffff;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--card-color);
+            transition: 0.3s;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-card:hover::before {
+            height: 10px;
+        }
+        
+        @keyframes pulse-dot {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(var(--rgb-color), 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 15px rgba(var(--rgb-color), 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(var(--rgb-color), 0);
+            }
+        }
+        
+        .circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .circle.green {
+            background: var(--success);
+            --rgb-color: 16, 185, 129;
+            animation: pulse-dot 2s infinite;
+        }
+        
+        .circle.yellow {
+            background: var(--warning);
+            --rgb-color: 245, 158, 11;
+            animation: pulse-dot 2s infinite 0.3s;
+        }
+        
+        .circle.red {
+            background: var(--danger);
+            --rgb-color: 239, 68, 68;
+            animation: pulse-dot 2s infinite 0.6s;
+        }
+        
+        footer {
+            padding: 60px 8%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 4px solid var(--accent);
+        }
+        
+        @media (max-width: 992px) {
+            .status-guide {
+                grid-template-columns: 1fr;
+            }
+            .emergency-bag {
+                flex-direction: column;
+                padding: 40px;
+            }
+            .bag-img-container {
+                order: -1;
+                margin-bottom: 30px;
+            }
+            .tab-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Logo"> SIAGA BANJIR <span style="color:var(--accent)">KAB.BEKASI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Beranda</a></li>
+            <li><a href="edukasi.html" style="color: var(--accent);">Edukasi Mitigasi</a></li>
+            <li><a href="sistem-utama.html" class="btn-monitor">Pantau Wilayah <i class="fas fa-chart-line" style="margin-left: 8px;"></i></a></li>
+        </ul>
+    </nav>
+
+    <header class="page-hero">
+        <h1 data-aos="fade-down">Panduan Kesiapsiagaan Bencana</h1>
+        <p data-aos="fade-up" data-aos-delay="200">Pengetahuan adalah pertahanan terbaik. Simulasi dan edukasi interaktif untuk memastikan Anda dan keluarga siap menghadapi segala skenario cuaca ekstrem.</p>
+    </header>
+
+    <section>
+        <span class="section-tag" data-aos="fade-up">Prosedur Keselamatan</span>
+        <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Pilih Skenario Mitigasi</h2>
+
+        <div class="tabs-container" data-aos="fade-up" data-aos-delay="200">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab(event, 'pra')">Pra-Bencana</button>
+                <button class="tab-btn" onclick="switchTab(event, 'saat')">Saat Bencana</button>
+                <button class="tab-btn" onclick="switchTab(event, 'pasca')">Pasca Bencana</button>
+            </div>
+
+            <div id="pra" class="tab-content active phase-card bg-pre">
+                <h2><i class="fas fa-shield-alt"></i> Pra-Bencana (Pencegahan)</h2>
+                <p style="opacity: 0.9; font-size: 16px;">Langkah preventif sebelum intensitas hujan meningkat.</p>
+                <ul>
+                    <li><i class="fas fa-satellite-dish"></i> Pantau intensitas hujan melalui dashboard AI-DSS Siaga Banjir.</li>
+                    <li><i class="fas fa-map-signs"></i> Sepakati lokasi titik kumpul evakuasi darurat dengan keluarga.</li>
+                    <li><i class="fas fa-trash-restore"></i> Bersihkan gorong-gorong dan pastikan saluran air tidak tersumbat.</li>
+                    <li><i class="fas fa-file-archive"></i> Amankan dokumen penting dalam map plastik kedap air.</li>
+                </ul>
+            </div>
+
+            <div id="saat" class="tab-content phase-card bg-during">
+                <h2><i class="fas fa-exclamation-triangle"></i> Saat Bencana (Evakuasi)</h2>
+                <p style="opacity: 0.9; font-size: 16px;">Tindakan cepat saat wilayah mulai tergenang air.</p>
+                <ul>
+                    <li><i class="fas fa-bolt"></i> Segera matikan aliran listrik dari MCB utama dan cabut regulator gas.</li>
+                    <li><i class="fas fa-phone-alt"></i> Hubungi Call Center 112 BPBD Bekasi jika terjebak.</li>
+                    <li><i class="fas fa-arrow-up"></i> Pindah ke lantai atas atau area evakuasi sesuai rekomendasi sistem.</li>
+                    <li><i class="fas fa-water"></i> Jangan memaksakan diri menerjang arus air yang deras berjalan kaki.</li>
+                </ul>
+            </div>
+
+            <div id="pasca" class="tab-content phase-card bg-post">
+                <h2><i class="fas fa-tools"></i> Pasca Bencana (Pemulihan)</h2>
+                <p style="opacity: 0.9; font-size: 16px;">Proses sterilisasi dan pemulihan setelah air surut.</p>
+                <ul>
+                    <li><i class="fas fa-biohazard"></i> Gunakan sepatu bot, waspadai penyakit seperti Leptospirosis.</li>
+                    <li><i class="fas fa-plug"></i> Pastikan semua alat elektronik benar-benar kering sebelum dicolok.</li>
+                    <li><i class="fas fa-spray-can"></i> Bersihkan sisa lumpur lantai menggunakan cairan karbol disinfektan.</li>
+                    <li><i class="fas fa-camera"></i> Dokumentasikan kerusakan properti untuk pelaporan ke aparat desa.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section style="background-color: var(--light);">
+        <div class="emergency-bag" data-aos="zoom-in">
+            <div class="bag-img-container">
+                <img src="TSB.jpg" alt="Tas Siaga Bencana">
+            </div>
+            <div class="bag-content">
+                <h2 style="font-size: 32px; margin-bottom: 15px; font-weight: 800; letter-spacing: -0.5px;">Siapkan Tas Siaga Bencana</h2>
+                <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 20px;">Siapkan atau Klik item di bawah ini untuk menandai barang yang sudah Anda masukkan ke dalam tas evakuasi. Pastikan semua logistik siap!</p>
+
+                <div class="bag-items">
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-pills item-icon"></i><span>Kotak P3K & Obat</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-tint item-icon"></i><span>Air Minum (3 Liter)</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-cookie item-icon"></i><span>Makanan Awet</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-lightbulb item-icon"></i><span>Senter & Baterai</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-tshirt item-icon"></i><span>Pakaian & Selimut</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-id-card item-icon"></i><span>Salinan Dokumen</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-power-off item-icon"></i><span>Powerbank & Peluit</span></div>
+                    <div class="bag-item" onclick="toggleCheck(this)"><i class="far fa-circle status-icon"></i><i class="fas fa-mask item-icon"></i><span>Masker & Sanitizer</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <span class="section-tag" data-aos="fade-up">Panduan Sistem</span>
+        <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Memahami Status Kerawanan AI-DSS</h2>
+
+        <div class="status-guide">
+            <div class="status-card" style="--card-color: var(--success);" data-aos="flip-left" data-aos-delay="100">
+                <div class="circle green"></div>
+                <h4 style="margin-bottom: 12px; font-size: 18px; font-weight: 800;">AMAN (HIJAU)</h4>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">Curah hujan rendah. Wilayah dalam kondisi stabil. Tetap jaga kebersihan saluran air.</p>
+            </div>
+            <div class="status-card" style="--card-color: var(--warning);" data-aos="flip-left" data-aos-delay="300">
+                <div class="circle yellow"></div>
+                <h4 style="margin-bottom: 12px; font-size: 18px; font-weight: 800;">WASPADA (KUNING)</h4>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">Hujan intensitas sedang terdeteksi. Mulai amankan barang berharga ke tempat yang lebih tinggi.</p>
+            </div>
+            <div class="status-card" style="--card-color: var(--danger);" data-aos="flip-left" data-aos-delay="500">
+                <div class="circle red"></div>
+                <h4 style="margin-bottom: 12px; font-size: 18px; font-weight: 800;">RAWAN (MERAH)</h4>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6;">Intensitas hujan tinggi (>50mm). Segera lakukan evakuasi sesuai arahan petugas.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div>
+            <p style="font-size: 18px; margin-bottom: 5px;"><strong>Siaga Banjir Kabupaten Bekasi</strong></p>
+            <p style="opacity: 0.8;">Portal Resmi Mitigasi & Monitoring Bencana.</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="opacity: 0.8; margin-bottom: 5px;">&copy; 2026 Pemerintah Kabupaten Bekasi.</p>
+            <p style="font-weight: 600;">Fullstack Developer: Kelompok 4 WebGIS TRPL 2023.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inisialisasi Animasi Scroll
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        // Fungsi Tab Interaktif Mitigasi
+        function switchTab(evt, phaseName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(phaseName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Fungsi Toggle Checklist Tas Bencana
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            let icon = element.querySelector('.status-icon');
+            if (element.classList.contains('checked')) {
+                icon.classList.remove('far', 'fa-circle');
+                icon.classList.add('fas', 'fa-check-circle');
+            } else {
+                icon.classList.remove('fas', 'fa-check-circle');
+                icon.classList.add('far', 'fa-circle');
+            }
+        }
+
+        // Efek Ripple pada Tombol (Opsional untuk micro-interaction)
+        const buttons = document.querySelectorAll('.btn-monitor');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+                let ripples = document.createElement('span');
+                ripples.style.left = x + 'px';
+                ripples.style.top = y + 'px';
+                ripples.classList.add('ripple');
+                this.appendChild(ripples);
+                setTimeout(() => {
+                    ripples.remove()
+                }, 600);
+            });
+        });
+    </script>
+</body>
+
+</html>

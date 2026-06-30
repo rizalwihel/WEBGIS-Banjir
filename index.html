@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siaga Banjir Kabupaten Bekasi | Portal Mitigasi & Monitoring AI-DSS</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+         :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --light: #f8fafc;
+            --text-muted: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: var(--primary);
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        /* Navigation */
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 8%;
+            background: rgba(255, 255, 255, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 15px;
+            transition: 0.3s;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .btn-monitor {
+            background: var(--accent);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-monitor::after {
+            display: none;
+        }
+        
+        .btn-monitor:hover {
+            transform: translateY(-3px);
+            background: #2563eb;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        /* Hero Section */
+        
+        .hero {
+            padding: 100px 8% 140px;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            background: radial-gradient(circle at top right, #eff6ff 0%, #ffffff 70%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-text {
+            flex: 1.2;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-tag {
+            display: inline-block;
+            padding: 8px 18px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .hero-text h1 {
+            font-size: 56px;
+            line-height: 1.15;
+            margin-bottom: 25px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+        
+        .hero-text p {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        
+        .hero-image {
+            flex: 0.8;
+            position: relative;
+            z-index: 2;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            transition: transform 0.5s ease;
+        }
+        /* Live Stats Strip */
+        
+        .stats-strip {
+            display: flex;
+            gap: 30px;
+            background: white;
+            padding: 35px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            margin-top: -70px;
+            position: relative;
+            z-index: 10;
+            width: 84%;
+            margin-left: 8%;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .stat-box {
+            flex: 1;
+            border-right: 1px solid #e2e8f0;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: default;
+        }
+        
+        .stat-box:last-child {
+            border: none;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-8px) scale(1.05);
+        }
+        
+        .stat-box:hover .stat-num {
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-num {
+            display: block;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Info Section: "Apa itu AI-DSS?" */
+        
+        .system-info {
+            padding: 120px 8%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            overflow: hidden;
+        }
+        /* -----------------------------------------------------
+           ANIMASI AI GUARDIAN BARU (Pengganti gambar statis)
+           ----------------------------------------------------- */
+        
+        .ai-guardian-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Robot Core di Tengah */
+        
+        .ai-core {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, var(--accent) 0%, #1e3a8a 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 65px;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+            animation: core-pulse 2s infinite alternate;
+        }
+        
+        @keyframes core-pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            }
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 50px rgba(59, 130, 246, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+        }
+        /* Perisai Sistem Berputar */
+        
+        .ai-shield {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            animation: spin linear infinite;
+        }
+        
+        .ring-1 {
+            width: 240px;
+            height: 240px;
+            border-top: 3px solid var(--accent);
+            animation-duration: 4s;
+        }
+        
+        .ring-2 {
+            width: 330px;
+            height: 330px;
+            border-bottom: 3px solid var(--success);
+            border-left: 3px solid var(--success);
+            animation-duration: 8s;
+            animation-direction: reverse;
+            border-style: dashed;
+        }
+        
+        .ring-3 {
+            width: 420px;
+            height: 420px;
+            border-right: 3px solid var(--warning);
+            animation-duration: 12s;
+            opacity: 0.5;
+        }
+        
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Node Sistem Mengambang di Sekitar Robot */
+        
+        .system-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            z-index: 11;
+        }
+        
+        .node-1 {
+            background: var(--primary);
+            top: 5%;
+            left: 15%;
+            animation: float-node 3s infinite alternate;
+        }
+        
+        .node-2 {
+            background: var(--warning);
+            bottom: 10%;
+            left: 10%;
+            animation: float-node 4s infinite alternate-reverse;
+        }
+        
+        .node-3 {
+            background: var(--success);
+            top: 35%;
+            right: 0%;
+            animation: float-node 3.5s infinite alternate;
+        }
+        
+        @keyframes float-node {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-20px);
+            }
+        }
+        /* ----------------------------------------------------- */
+        
+        .feature-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 35px;
+            padding: 20px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+        }
+        
+        .feature-item:hover {
+            background: #ffffff;
+            border-color: rgba(59, 130, 246, 0.2);
+            transform: translateX(15px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            transition: 0.3s;
+        }
+        
+        .feature-item:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        /* Emergency Section */
+        
+        .emergency-banner {
+            margin: 0 8% 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 32px;
+            padding: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .emergency-banner::before {
+            content: '';
+            position: absolute;
+            right: -10%;
+            top: -50%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .emergency-banner h2 {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 10px;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .call-center {
+            background: var(--danger);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-size: 32px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 2;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse-danger 2s infinite;
+        }
+        
+        @keyframes pulse-danger {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        .call-center:hover {
+            background: #dc2626;
+            transform: scale(1.05) translateY(-5px);
+        }
+        
+        footer {
+            padding: 60px 8%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 4px solid var(--accent);
+        }
+        
+        @media (max-width: 1024px) {
+            .hero,
+            .system-info,
+            .emergency-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-text h1 {
+                font-size: 42px;
+            }
+            .hero-image {
+                animation: none;
+                margin-top: 30px;
+            }
+            .stats-strip {
+                flex-direction: column;
+                width: 90%;
+                margin-left: 5%;
+                padding: 20px;
+            }
+            .stat-box {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 15px 0;
+            }
+            .stat-box:last-child {
+                border-bottom: none;
+            }
+            .feature-item {
+                text-align: left;
+            }
+            .ai-guardian-wrapper {
+                margin-bottom: 50px;
+                transform: scale(0.8);
+            }
+            footer {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            footer div {
+                text-align: center !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Logo"> SIAGA BANJIR <span style="color:var(--accent)">KAB.BEKASI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html" style="color: var(--accent);">Beranda</a></li>
+            <li><a href="edukasi.html">Edukasi Mitigasi</a></li>
+            <li><a href="sistem-utama.html" class="btn-monitor">Pantau Wilayah <i class="fas fa-chart-line" style="margin-left: 8px;"></i></a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-text" data-aos="fade-right" data-aos-duration="1000">
+            <span class="hero-tag">BEKASI FLOODGUARD AI-DSS</span>
+            <h1>Siaga Bencana Melalui Presisi Data Spasial.</h1>
+            <p>Platform terintegrasi Pemerintah Kabupaten Bekasi untuk pemantauan banjir real-time menggunakan kecerdasan buatan dan analisis cuaca satelit presisi tinggi.</p>
+        </div>
+        <div class="hero-image" data-aos="fade-left" data-aos-duration="1200">
+            <img src="siaga-banjir.jpg" alt="Ilustrasi Siaga Banjir">
+        </div>
+    </header>
+
+    <div class="stats-strip" id="stats-view" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-box">
+            <span class="stat-num" id="total-kec">23</span>
+            <span class="stat-label">Kecamatan Terpantau</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-num" id="avg-rain" style="color: var(--accent);">--</span>
+            <span class="stat-label">Avg. Curah Hujan (mm)</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-num" id="rawan-num" style="color: var(--danger);">--</span>
+            <span class="stat-label">Wilayah Status Rawan</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-num">AI Agent</span>
+            <span class="stat-label">Mitigasi Llama 3.1</span>
+        </div>
+    </div>
+
+    <section class="system-info" id="tentang">
+        <div class="ai-guardian-wrapper" data-aos="zoom-in-right" data-aos-duration="1000">
+            <div class="ai-shield ring-1"></div>
+            <div class="ai-shield ring-2"></div>
+            <div class="ai-shield ring-3"></div>
+
+            <div class="ai-core">
+                <i class="fas fa-robot"></i>
+            </div>
+
+            <div class="system-node node-1"><i class="fas fa-database"></i></div>
+            <div class="system-node node-2"><i class="fas fa-satellite"></i></div>
+            <div class="system-node node-3"><i class="fas fa-server"></i></div>
+        </div>
+
+        <div data-aos="fade-left" data-aos-duration="1000">
+            <span class="hero-tag">Teknologi DSS Terintegrasi</span>
+            <h2 style="font-size: 38px; font-weight: 800; margin-bottom: 40px; line-height: 1.2;">Bagaimana Sistem Kami Melindungi Anda?</h2>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-satellite"></i></div>
+                <div>
+                    <h4 style="margin-bottom: 8px; font-size: 20px; font-weight: 700;">Forecasting Open-Meteo</h4>
+                    <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6;">Menarik data cuaca satelit untuk memberikan prediksi intensitas hujan 12 jam ke depan bagi 23 kecamatan secara akurat.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                <div>
+                    <h4 style="margin-bottom: 8px; font-size: 20px; font-weight: 700;">Mitigasi Berbasis AI (Llama 3.1)</h4>
+                    <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6;">Mesin kecerdasan buatan yang menganalisis korelasi data untuk memberikan saran mitigasi darurat spesifik bagi setiap wilayah.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <div>
+                    <h4 style="margin-bottom: 8px; font-size: 20px; font-weight: 700;">Analisis Spasial PostGIS</h4>
+                    <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6;">Peta interaktif yang mengklasifikasikan kerawanan wilayah berdasarkan topografi dan penggunaan lahan secara visual presisi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="emergency-banner" data-aos="zoom-in" data-aos-duration="800">
+        <div style="z-index: 2;">
+            <h2>Kondisi Darurat di Wilayah Anda?</h2>
+            <p style="color: #cbd5e1; margin-bottom: 0; font-size: 16px;">Segera hubungi layanan Call Center BPBD Kabupaten Bekasi untuk evakuasi.</p>
+        </div>
+        <a href="tel:112" class="call-center">
+            <i class="fas fa-headset"></i> 112
+        </a>
+    </section>
+
+    <footer>
+        <div>
+            <p style="font-size: 18px; margin-bottom: 5px;"><strong>Siaga Banjir Kabupaten Bekasi</strong></p>
+            <p style="opacity: 0.8; font-size: 15px;">Portal Resmi Mitigasi & Monitoring Bencana.</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="opacity: 0.8; margin-bottom: 5px; font-size: 15px;">&copy; 2026 Pemerintah Kabupaten Bekasi.</p>
+            <p style="font-weight: 600; font-size: 15px;">Fullstack Developer: Kelompok 4 WebGIS TRPL 2023.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        // -------------------------------------------------------------
+        // BACKEND TETAP AMAN TIDAK ADA YANG DIUBAH
+        // -------------------------------------------------------------
+        const API_URL = "http://103.87.66.175:5674/webhook/stats-ringkasan";
+
+        function loadStats() {
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const s = Array.isArray(data) ? data[0] : data;
+                    document.getElementById('avg-rain').innerText = s.rata_rata_hujan + " mm";
+                    document.getElementById('rawan-num').innerText = s.jumlah_rawan;
+                    document.getElementById('total-kec').innerText = s.total_kecamatan || 23;
+                })
+                .catch(err => {
+                    console.log("Database Syncing...");
+                    document.getElementById('avg-rain').innerText = "Syncing...";
+                });
+        }
+        loadStats();
+    </script>
+</body>
+
+</html>
